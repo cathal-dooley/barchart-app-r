@@ -1,0 +1,130 @@
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Demo WebApp using DeployR</title>
+   </head>
+   <body>
+      <!DOCTYPE html>
+      <html lang="en">
+         <head>
+            <meta charset="utf-8">
+            <title>Examples: Simple Script execution</title>
+            <link rel="stylesheet" href="bootstrap-combined.min.css">
+            <link rel="stylesheet" href="main.css">
+            <link rel="stylesheet" href="prettify-min.css">
+         </head>
+         <body>
+            <div class="container">
+               <div class="row-fluid">
+                  <div class="page-header">
+                     <div class="muted pull-right">
+                     </div>
+                     <h1>Examples: Simple Script Execution - Histogram of Auto Sales</h1>
+                  </div>
+               </div>
+               <div id= "doc" class="row-fluid">
+                  <div class="span9">
+                     <div class="revo-content">
+                        <!-- custom styles for this example -->
+                        <style>  
+                           #results-canvas .bd{
+                           height: 300px;      
+                           }
+                           #input-canvas input {
+                           margin-top: -10px;
+                           }
+                        </style>
+                        <div class="well">
+                           <p>
+                              This sample runs an R script called <code>
+                              histogramV1</code>. The script creates a vector of auto sales for each category of vehicle.
+							  The value contains the number of units sold each weekday and produces the corresponding histogram.
+                           </p>
+                           <p>
+                              This sample demonstrates a use of DeployR's JavaScript UI utilities (deployR)
+                              interacting with the DeployR's RESTful API interface to R. The R script <code>
+                              histogramV1</code> was created and stored in the DeployR management 
+                              console.
+                           </p>
+                        </div>
+                        <div class="example">
+                           <div id="example-canvas">
+                              <div id="input-canvas" class="span6">
+                                 <p id="demo" align="center"> </p>
+                              </div>
+                           </div>
+                        </div>
+                        <h3 id="r-script">R Script</h3>
+                        <p>
+                           The R script <code>histogramV1</code> is defined below:
+                        </p>
+                        <pre class="code prettyprint"># Create a vector of auto sales for each category of vechicles.
+# The value contains the number of units sold each weekday:
+# (i.e. 1 car sold on Monday, 3 cars sold on Tuesday...)
+						
+cars&lt;- c(1, 3, 6, 4, 9)
+trucks &lt;- c(2, 5, 4, 5, 12)
+suvs &lt;- c(4,4,6,6,16)
+						
+ls()
+# Create a table from the vectors.
+autos_data &lt;- cbind(cars, trucks, suvs)
+						
+# Show the the table.
+print(autos_data)
+						
+# Send the plot to a file called histogram.png.
+png("histogram.png")
+						
+# Create a histogram of auto sales.
+barplot(as.matrix(autos_data), main=&quot;Autos&quot;, ylab= &quot;Total&quot;,  beside=TRUE, col=rainbow(5))
+						
+# Place the legend at the top-left corner with no frame, using rainbow colors.
+legend(&quot;topleft&quot;, c(&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;), cex=0.6, bty=&quot;n&quot;, fill=rainbow(5))
+# Restore the plot device.
+dev.off()</pre>
+                     </div>
+                  </div>
+               </div>
+               <!-- /row-fluid -->
+               <hr>
+            </div>
+            <!--/.fluid-container-->
+            <script src="prettify-min.js"></script>
+            <script>prettyPrint();</script>
+            <script src="deployr.js"></script>
+            <script src="require.js"></script>
+            <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>		
+            <script>
+               /*
+                 * Run example.
+                 */
+                function run(config) {
+                	deployr.configure( { 
+                		logging: false, 
+                		host: config.endpoint, 
+                		cors: config.cors 
+                	});
+                	
+                	deployr.io('/r/repository/script/execute')
+                	  .data({ author: 'cathal', directory: 'root', filename: 'histogramV1' })
+                	  .end(function(res) {
+                		  //
+                		  // 3. Retrieve the analytics Web service execution results.
+                		  //
+                		  var exec = res.get('execution');
+                		  var workspace = res.get('workspace');
+                		  var console = exec.console;
+                		  var plots = exec.results;
+               		  var files = exec.artifacts;
+                		  var objects = workspace.objects;
+               
+                		  document.getElementById("demo").innerHTML ='<img alt="plot" src="' + files[0].url + '" width="400">'; 
+                	});  
+                 }
+               // -- load configuration and run example --
+               $.getJSON('config.json').done(function(config) { run(config); });    
+            </script>
+         </body>
+      </html>
