@@ -71,7 +71,7 @@ ls()
 # Create a table from the vectors.
 autos_data &lt;- cbind(cars, trucks, suvs)
 						
-# Show the the table.
+# Show the table.
 print(autos_data)
 						
 # Send the plot to a file called histogram.png.
@@ -117,7 +117,7 @@ dev.off()</pre>
                 		  var workspace = res.get('workspace');
                 		  var console = exec.console;
                 		  var plots = exec.results;
-               		  var files = exec.artifacts;
+               		  	  var files = exec.artifacts;
                 		  var objects = workspace.objects;
                
                 		  document.getElementById("demo").innerHTML ='<img alt="plot" src="' + files[0].url + '" width="400">'; 
